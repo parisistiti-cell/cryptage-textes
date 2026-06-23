@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Titicrypt - Outil de Chiffrement / Déchiffrement</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    background: #eef0f3;
+    display: flex;
+    justify-content: center;
+    padding: 30px 10px;
+    margin: 0;
+  }
+  .window {
+    background: #f0f0f0;
+    border: 1px solid #999;
+    border-radius: 4px;
+    width: 100%;
+    max-width: 720px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+    overflow: hidden;
+  }
+  .titlebar {
+    background: linear-gradient(to bottom, #3a3a3a, #2b2b2b);
+    color: #fff;
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .content {
+    padding: 16px 20px 22px;
+  }
+  label.key-label {
+    display: inline-block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    color: #222;
+  }
+  .key-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 18px;
+  }
+  .key-row input {
+    flex: 0 0 260px;
+    padding: 5px 8px;
+    border: 1px solid #888;
+    border-radius: 2px;
+    font-size: 14px;
+  }
+  h3.section-title {
+    text-align: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #222;
+    margin: 0 0 8px;
+  }
+  textarea {
+    width: 100%;
+    border: 1px solid #888;
+    border-radius: 2px;
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    font-size: 14px;
+    padding: 8px;
+    resize: vertical;
+    background: #fff;
+  }
+  #inputText { height: 150px; margin-bottom: 14px; }
+  #resultText { height: 150px; margin-top: 10px; }
+  .buttons {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  button {
+    padding: 7px 16px;
+    font-size: 13.5px;
+    border: 1px solid #999;
+    border-radius: 3px;
+    background: linear-gradient(to bottom, #fdfdfd, #e6e6e6);
+    cursor: pointer;
+  }
+  button:hover {
+    background: linear-gradient(to bottom, #ffffff, #dcdcdc);
+  }
+  button:active {
+    background: #d0d0d0;
+  }
+  .status {
+    text-align: center;
+    font-size: 13px;
+    color: #b00020;
+    min-height: 18px;
+    margin-top: 4px;
+  }
+  .share-section {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid #ccc;
+  }
+  .share-options {
+    display: flex;
+    justify-content: center;
+    gap: 18px;
+    margin-bottom: 12px;
+    font-size: 13.5px;
+    flex-wrap: wrap;
+  }
+  .share-options label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+  }
+  #hintRow {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px;
+  }
+  #hintRow input {
+    width: 100%;
+    max-width: 420px;
+    padding: 5px 8px;
+    border: 1px solid #888;
+    border-radius: 2px;
+    font-size: 14px;
+  }
+  #shareOutput {
+    height: 70px;
+    margin-bottom: 10px;
+  }
+  .info-banner {
+    background: #fff7d6;
+    border: 1px solid #e0c34a;
+    border-radius: 3px;
+    padding: 8px 10px;
+    font-size: 13.5px;
+    margin-bottom: 14px;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<div class="window">
+  <div class="titlebar">🔒 Titicrypt - Outil de Chiffrement / Déchiffrement</div>
+  <div class="content">
+
+    <div class="key-row">
+      <label class="key-label" for="keyField">Clé :</label>
+      <input type="text" id="keyField" placeholder="Entrez la clé alphanumérique">
+    </div>
+
+    <h3 class="section-title">Texte à coder / décoder :</h3>
+    <textarea id="inputText" placeholder="Collez ou tapez votre texte ici..."></textarea>
+
+    <div class="buttons">
+      <button id="btnCoder">Coder</button>
+      <button id="btnDecoder">Décoder</button>
+      <button id="btnSave">Enregistrer le résultat</button>
+    </div>
+    <div class="status" id="statusMsg"></div>
+
+    <h3 class="section-title">Résultat :</h3>
+    <textarea id="resultText" readonly></textarea>
+
+    <div class="share-section">
+      <h3 class="section-title">Partager le texte codé</h3>
+
+      <div class="share-options">
+        <label><input type="radio" name="shareMode" value="none" checked> Sans information sur la clé</label>
+        <label><input type="radio" name="shareMode" value="hint"> Avec un indice</label>
+        <label><input type="radio" name="shareMode" value="key"> Avec la clé complète</label>
+      </div>
+
+      <div id="hintRow" style="display:none;">
+        <input type="text" id="hintField" placeholder="Tape ton indice ici (ex: ancien mot de passe mail laposte)">
+      </div>
+
+      <div class="buttons">
+        <button id="btnGenerateShare">Générer le message à partager</button>
+        <button id="btnCopyShare">Copier</button>
+        <button id="btnNativeShare" style="display:none;">📤 Partager</button>
+      </div>
+
+      <textarea id="shareOutput" readonly placeholder="Le message prêt à partager apparaîtra ici..."></textarea>
+      <div class="status" id="shareStatus"></div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Algorithme Titicrypt reconstitué : XOR(texte, clé répétée) + octet terminateur ';'
+  // puis encodage en Base64 (et inverse pour le décodage)
+
+  function strToBytes(str) {
+    const bytes = new Uint8Array(str.length);
+    for (let i = 0; i < str.length; i++) bytes[i] = str.charCodeAt(i) & 0xFF;
+    return bytes;
+  }
+
+  function bytesToBase64(bytes) {
+    let binary = "";
+    for (let i = 0; i < bytes.length; i++) binary += String.fromCharCode(bytes[i]);
+    return btoa(binary);
+  }
+
+  function base64ToBytes(b64) {
+    const binary = atob(b64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    return bytes;
+  }
+
+  function encodeText(text, key) {
+    const textBytes = strToBytes(text);
+    const keyBytes = strToBytes(key);
+    const out = new Uint8Array(textBytes.length + 1);
+    for (let i = 0; i < textBytes.length; i++) {
+      out[i] = textBytes[i] ^ keyBytes[i % keyBytes.length];
+    }
+    out[textBytes.length] = 0x3B; // ';' terminateur
+    return bytesToBase64(out);
+  }
+
+  function decodeText(cipherB64, key) {
+    const allBytes = base64ToBytes(cipherB64);
+    const cipherBytes = allBytes.slice(0, allBytes.length - 1); // retire le ';'
+    const keyBytes = strToBytes(key);
+    let result = "";
+    for (let i = 0; i < cipherBytes.length; i++) {
+      result += String.fromCharCode(cipherBytes[i] ^ keyBytes[i % keyBytes.length]);
+    }
+    return result;
+  }
+
+  // Permet de coller le message partagé en entier (avec indice/clé) :
+  // on extrait automatiquement la ligne de texte codé.
+  function extractCipherFromInput(text) {
+    const marker = "Texte codé :";
+    const idx = text.indexOf(marker);
+    if (idx !== -1) {
+      const after = text.slice(idx + marker.length);
+      const lines = after.split("\n").map(l => l.trim()).filter(l => l.length > 0);
+      if (lines.length > 0) return lines[0];
+    }
+    // Sinon, on prend simplement la première ligne non vide du texte collé
+    const firstLine = text.split("\n").map(l => l.trim()).filter(l => l.length > 0)[0];
+    return firstLine !== undefined ? firstLine : text.trim();
+  }
+
+  function processText(text, key, encode) {
+    if (!key || key.length === 0) return null;
+    if (encode) {
+      return encodeText(text, key);
+    } else {
+      const cipher = extractCipherFromInput(text);
+      return decodeText(cipher, key);
+    }
+  }
+
+  const keyField = document.getElementById('keyField');
+  const inputText = document.getElementById('inputText');
+  const resultText = document.getElementById('resultText');
+  const statusMsg = document.getElementById('statusMsg');
+
+  function runProcess(encode) {
+    const key = keyField.value;
+    const text = inputText.value;
+    statusMsg.textContent = "";
+
+    if (!key) {
+      statusMsg.textContent = "⚠️ Veuillez entrer une clé.";
+      resultText.value = "";
+      return;
+    }
+    if (!text) {
+      statusMsg.textContent = "⚠️ Veuillez entrer un texte à coder/décoder.";
+      resultText.value = "";
+      return;
+    }
+
+    try {
+      const output = processText(text, key, encode);
+      resultText.value = output;
+    } catch (e) {
+      statusMsg.textContent = "❌ Erreur : clé ou texte invalide.";
+      resultText.value = "";
+    }
+  }
+
+  document.getElementById('btnCoder').addEventListener('click', () => runProcess(true));
+  document.getElementById('btnDecoder').addEventListener('click', () => runProcess(false));
+
+  document.getElementById('btnSave').addEventListener('click', () => {
+    if (!resultText.value) {
+      statusMsg.textContent = "⚠️ Aucun résultat à enregistrer.";
+      return;
+    }
+    const blob = new Blob([resultText.value], { type: "text/plain;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = "resultat_titicrypt.txt";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    statusMsg.textContent = "✅ Résultat enregistré.";
+  });
+
+  // --- Partage du texte codé ---
+  const hintRow = document.getElementById('hintRow');
+  const hintField = document.getElementById('hintField');
+  const shareOutput = document.getElementById('shareOutput');
+  const shareStatus = document.getElementById('shareStatus');
+  const btnNativeShare = document.getElementById('btnNativeShare');
+
+  document.querySelectorAll('input[name="shareMode"]').forEach(radio => {
+    radio.addEventListener('change', () => {
+      hintRow.style.display = (radio.value === 'hint' && radio.checked) ? 'flex' : hintRow.style.display;
+      if (radio.checked && radio.value !== 'hint') {
+        hintRow.style.display = 'none';
+      }
+    });
+  });
+
+  document.getElementById('btnGenerateShare').addEventListener('click', () => {
+    shareStatus.textContent = "";
+    const codedText = resultText.value;
+
+    if (!codedText) {
+      shareStatus.textContent = "⚠️ Code d'abord un texte avant de le partager.";
+      shareOutput.value = "";
+      return;
+    }
+
+    const mode = document.querySelector('input[name="shareMode"]:checked').value;
+    let message = "🔐 Texte codé :\n" + codedText;
+
+    if (mode === 'hint') {
+      const hint = hintField.value.trim();
+      if (!hint) {
+        shareStatus.textContent = "⚠️ Ajoute un indice avant de générer le message.";
+        shareOutput.value = "";
+        return;
+      }
+      message += "\n\n🔑 Indice pour retrouver la clé : " + hint;
+    } else if (mode === 'key') {
+      const key = keyField.value;
+      if (!key) {
+        shareStatus.textContent = "⚠️ Aucune clé renseignée à inclure.";
+        shareOutput.value = "";
+        return;
+      }
+      message += "\n\n🔑 Clé : " + key;
+    }
+
+    shareOutput.value = message;
+    shareStatus.textContent = "✅ Message prêt — copie-le ou partage-le.";
+
+    if (navigator.share) {
+      btnNativeShare.style.display = "inline-block";
+    }
+  });
+
+  document.getElementById('btnCopyShare').addEventListener('click', async () => {
+    if (!shareOutput.value) {
+      shareStatus.textContent = "⚠️ Génère d'abord le message à partager.";
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(shareOutput.value);
+      shareStatus.textContent = "✅ Copié dans le presse-papiers !";
+    } catch (e) {
+      shareOutput.select();
+      document.execCommand('copy');
+      shareStatus.textContent = "✅ Copié dans le presse-papiers !";
+    }
+  });
+
+  btnNativeShare.addEventListener('click', async () => {
+    if (!shareOutput.value) return;
+    try {
+      await navigator.share({ text: shareOutput.value, title: "Titicrypt - Texte codé" });
+    } catch (e) {
+      // Annulé ou non supporté, on ignore
+    }
+  });
+</script>
+
+</body>
+</html>
