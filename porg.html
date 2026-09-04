@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Titicrypt - Outil de Chiffrement / Déchiffrement</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 <style>
   * { box-sizing: border-box; }
   :root {
@@ -345,6 +346,29 @@
   }
   #shareOutput { height: 170px; margin-bottom: 10px; font-size: 17px; text-align: center; line-height: 1.5; }
 
+  .qr-section {
+    text-align: center;
+    margin-bottom: 18px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #ccc;
+  }
+  #qrWrap { text-align: center; margin-top: 10px; }
+  #qrContainer {
+    display: inline-block;
+    max-width: 100%;
+    padding: 10px;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    line-height: 0;
+    box-sizing: border-box;
+  }
+  #qrContainer canvas, #qrContainer img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
   .channel-btn {
     flex-direction: column;
     gap: 4px;
@@ -466,7 +490,9 @@
         <div class="example-bubble">
           💡 Essayez de décoder si vous retrouvez la clé ! Sinon, <span id="clearInputText" class="clear-link">effacez ce texte</span>.
         </div>
-        <textarea id="inputText" placeholder="Collez ou tapez votre texte ici..."> EBdkX1UXXkFAWENFRVlYRdkXQhZVREURV1tYQkPeVBFUVl9CEFtUREJEEVRdR11eWUQRVUUXRVRdR0IRREVeQRBHXVRZWUIdEFJFEVlbQhFcEF5fRBdCUFlEWFQQRFBfQxdZ2ENeRVRCGRF9URdDXkVDVBFGUkNCEFsWXlPeUF8cF0dUQkQRfVUXYV5CUFQRf1TYUF4bEVJVQxFUXlNDXllDEUBFEFhdEFReX15WWEJDVlhFEFVYVF4bEV7JF1hdEFZHUFlDEV0XX1BTWUNEVVUXVVQQUVBYQlIRWVFbRVQQR15EQhddUBBZRFhEGxFVUVlCEUNYXxFWWERDV1hfHRBbXkNDF1VUEERUQhBT2EFcVlJUXVJfRUMXR1RCRBFzX0VVVFFCSR0QQl8RXF5URBDXEV1FXhFARV4RUFxbUFhEF1VURlJfWEIbEV0XUkJBUVRUEVQQRF8QVkFD2EQcXFlTWB0QQl8RXF5URBDXEVRFTx87eVtCEUNSEUJfWUURQlJFQ19CR9hDF0JURVtCEUNCQxFcVhFBXFZWVBwXQl5FRBFEXhdCXlxSWF0QUNhf2UVUREgbEUFCUkJARVIRUl9aQV1ZVFQfEHtUEURSXEFDGxFEXlIRV19eQhFUUhFBXEJCHRBWEUJVWlNd2RdCRENHVF9URVQRQ1hfEVNYRENDGRF4XEQRXl5DEUFRRV3YHBddXl5QRFRdUl9FHBdVFkVZVBFGXlQRQt1H2FUbEVVVF1JUEEZEFlVbXVQQVkRDUV5FEUBCEdtERVQdEFNUEVNSEUBFEFRdXFIRQV9CQ0NRXkURQFJERR3dRUNVF1RfU1hDVBDdRUNVGxFVUVlCEUVZEVBZW11URUVCEV/OEUVfQkURQ1JDUFlDEUFcQkIRQ15cQVxSHzt1W11UEERUEUBFXkXZUFRQWUMRVUUXQl5cUlhdEFNEEV1eVERIF0BEF1JdXVUXQV5FQVBYRBsRUl9ZQlJZUl9FVRdVRBBFWEJBQlQRChdUXVxSEV8X3kVQWUMRUlVZQthVF9tFQlIRXdAbEV9ZF0FeQkNUQxBEREMQRFARQFJQRBBbUBFERVBSVRdEXxBHVEQQQ0NeQBdD2EbeXVBERVhSVRdVFkVZVBFaWERDXt5UEUZYXdhVGRFkXhdCVFNFVEUQU1QRQFtEQhwXRVReU0NUEFJFEUVZEUFVQhFHVUVFWFdeX1RFTx87fBBQQULfQhxdXlVYEEQWVENDEUFCWF1eXlDYEUNYREIQW1RCEEdYX0MbEVVRWUIRRVlUEVRYRFJVF9hFQlJYX0RSHRFSUkNS2VIRQVFFEV1VF1NDRV5FEVxYWF9EVlhfEFNUQhBBUFZFUkIRVUMRXVUXQVBCUURcEEXYQllZVERIF1VUEFtQEVZYQ9tEF11QXlNQWENSER0QQl8RUUJFQ1UXVVQQVFRCEF5fQkRWX0VDF0JEQ0dUX1RCQhFBQhZYXEQRQlVaU11RXlRfRBdSXlxbVFJEXl5fXlJDHRBUXlxdUhFBX0JDEUNSEUFCWERHVUUdEVNfUEBFUhFXX15CHRBGRFQQVFQRQUIWWFxEEUdZQVBYVVlFEdlDUFhEF1NYVVkRQ9lSXR87</textarea>
+        <textarea id="inputText" placeholder="Collez ou tapez votre texte ici...">
+        ZHQACxAXZF9VF15BQFhDRUVZWEXZF0IWVURFEVdbWEJD3lQRVFZfQhBbVERCRBFUXUddXllEEVVFF0VUXUdCEURFXkEQR11UWVlCHRBSRRFZW0IRXBBeX0QXQlBZRFhUEERQX0MXWdhDXkVUQhkRfVEXQ15FQ1QRRlJDQhBbFl5T3lBfHBdHVEJEEX1VF2FeQlBUEX9U2FBeGxFSVUMRVF5TQ15ZQxFARRBYXRBUXl9eVlhCQ1ZYRRBVWFReGxFeyRdYXRBWR1BZQxFdF19QU1lDRFVVF1VUEFFQWEJSEVlRW0VUEEdeREIXXVAQWURYRBsRVVFZQhFDWF8RVlhEQ1dYXx0QW15DQxdVVBBEVEIQU9hBXFZSVF1SX0VDF0dUQkQRc19FVVRRQkkdEEJfEVxeVEQQ1xFdRV4RQEVeEVBcW1BYRBdVVEZSX1hCGxFdF1JCQVFUVBFUEERfEFZBQ9hEHFxZU1gdEEJfEVxeVEQQ1xFURU8fO3lbQhFDUhFCX1lFEUJSRUNfQkfYQxdCVEVbQhFDQkMRXFYRQVxWVlQcF0JeRUQRRF4XQl5cUlhdEFDYX9lFVERIGxFBQlJCQEVSEVJfWkFdWVRUHxB7VBFEUlxBQxsRRF5SEVdfXkIRVFIRQVxCQh0QVhFCVVpTXdkXQkRDR1RfVEVUEUNYXxFTWERDQxkReFxEEV5eQxFBUUVd2BwXXV5eUERUXVJfRRwXVRZFWVQRRl5UEULdR9hVGxFVVRdSVBBGRBZVW11UEFZEQ1FeRRFAQhHbREVUHRBTVBFTUhFARRBUXVxSEUFfQkNDUV5FEUBSREUd3UVDVRdUX1NYQ1QQ3UVDVRsRVVFZQhFFWRFQWVtdVEVFQhFfzhFFX0JFEUNSQ1BZQxFBXEJCEUNeXEFcUh87dVtdVBBEVBFARV5F2VBUUFlDEVVFF0JeXFJYXRBTRBFdXlRESBdARBdSXV1VF0FeRUFQWEQbEVJfWUJSWVJfRVUXVUQQRVhCQUJUEQoXVF1cUhFfF95FUFlDEVJVWULYVRfbRUJSEV3QGxFfWRdBXkJDVEMQRERDEERQEUBSUEQQW1ARREVQUlUXRF8QR1REEENDXkAXQ9hG3l1QREVYUlUXVRZFWVQRWlhEQ17eVBFGWF3YVRkRZF4XQlRTRVRFEFNUEUBbREIcF0VUXlNDVBBSRRFFWRFBVUIRR1VFRVhXXl9URU8fO3wQUEFC30IcXV5VWBBEFlRDQxFBQlhdXl5Q2BFDWERCEFtUQhBHWF9DGxFVUVlCEUVZVBFUWERSVRfYRUJSWF9EUh0RUlJDUtlSEUFRRRFdVRdTQ0VeRRFcWFhfRFZYXxBTVEIQQVBWRVJCEVVDEV1VF0FQQlFEXBBF2EJZWVRESBdVVBBbUBFWWEPbRBddUF5TUFhDUhEdEEJfEVFCRUNVF1VUEFRUQhBeX0JEVl9FQxdCRENHVF9UQkIRQUIWWFxEEUJVWlNdUV5UX0QXUl5cW1RSRF5eX15SQx0QVF5cXVIRQV9CQxFDUhFBQlhER1VFHRFTX1BARVIRV19eQh0QRkRUEFRUEUFCFlhcRBFHWUFQWFVZRRHZQ1BYRBdTWFVZEUPZUl0fOw==
+        </textarea>
         <div class="status" id="inputLockHint" style="color:#555;"></div>
 
         <div class="buttons">
@@ -502,6 +528,25 @@
       </div>
 
       <div class="tab-body" id="tabBodyShare" style="display:none;">
+
+        <div class="qr-section">
+          <div class="example-bubble">
+            📱 Génère un QR code qui ouvre Titicrypt avec le texte codé <strong>déjà rempli</strong>. La personne qui le scanne n'a plus qu'à taper la clé pour lire le message — et peut répondre de la même façon.
+          </div>
+          <div class="buttons">
+            <button id="btnGenerateQr" class="primary" title="Générer un QR code menant au texte codé, prêt à décoder">📱 Générer un QR code</button>
+          </div>
+          <div id="qrWrap" style="display:none;">
+            <div id="qrContainer"></div>
+            <div class="buttons" style="margin-top:8px;">
+              <button id="btnCopyQrImage" class="subtle" title="Copier l'image du QR code seul">📋 Copier le QR code</button>
+              <button id="btnSaveQrImage" class="subtle" title="Enregistrer l'image du QR code seul">💾 Enregistrer le QR code</button>
+              <button id="btnCopyQrLink" class="subtle" title="Copier le lien du QR code">🔗 Copier le lien</button>
+            </div>
+          </div>
+          <div class="status" id="qrStatus"></div>
+          <div style="font-size:11.5px; color:#777; margin-top:6px; line-height:1.4;">ℹ️ Le lien n'est pas affiché à l'écran (texte codé placé après <code>#</code>, jamais envoyé au serveur) — au scan, l'appareil est envoyé directement sur le site. Utilisez « Copier le lien » si vous en avez besoin autrement.</div>
+        </div>
 
         <div class="share-options">
           <label><input type="radio" name="shareMode" value="none" checked> Sans information sur la clé</label>
@@ -604,8 +649,13 @@
 
       <h3>📤 Onglet Partager</h3>
       <ul>
-        <li>Choisissez le niveau d'information à inclure : <strong>sans info</strong> sur la clé, avec un <strong>indice</strong> pour la retrouver, ou avec la <strong>clé complète</strong>.</li>
-        <li><strong>Générer le message à partager</strong> prépare le texte final, prêt à envoyer. Ce bouton devient <span style="color:#1d4ec9;font-weight:700;">bleu</span> pour un message codé et <span style="color:#1f7a37;font-weight:700;">vert</span> pour un message décodé, selon ce qui se trouve dans l'onglet Résultat.</li>
+        <li><strong>📱 Générer un QR code</strong> : crée un QR code qui rouvre Titicrypt avec le texte codé <em>déjà rempli</em> dans l'onglet Texte. Le lien n'est jamais affiché à l'écran, et ne contient jamais la clé — uniquement le texte codé, placé après le <code>#</code> pour ne jamais être transmis au serveur qui héberge la page. Tout est généré localement, dans le navigateur, sans aucun service externe.</li>
+        <li><strong>📋 Copier le QR code</strong> / <strong>💾 Enregistrer le QR code</strong> : copient ou téléchargent l'image du QR code seul (en PNG), prête à coller ou envoyer en pièce jointe dans une conversation.</li>
+        <li><strong>🔗 Copier le lien</strong> : copie le lien correspondant dans le presse-papiers, si vous préférez l'envoyer sans passer par le QR code.</li>
+        <li>Quand quelqu'un ouvre ce lien ou scanne le QR code, la page se recharge avec le texte codé déjà rempli dans l'onglet Texte, verrouillé comme d'habitude — il ne reste plus qu'à taper la clé et cliquer sur <strong>Décoder</strong>. Pour répondre, il suffit de coder sa réponse avec la même clé puis de générer son propre QR code, de la même façon.</li>
+        <li>⚠️ Pour que ce lien/QR code fonctionne pour quelqu'un d'autre, cette page doit être <strong>hébergée en ligne</strong> (une vraie adresse <code>https://...</code>), pas simplement ouverte comme fichier local sur votre appareil.</li>
+        <li>En dessous, un autre moyen de partager : choisissez le niveau d'information à inclure dans un <strong>message texte</strong> — <strong>sans info</strong> sur la clé, avec un <strong>indice</strong> pour la retrouver, ou avec la <strong>clé complète</strong>.</li>
+        <li><strong>Générer le message à partager</strong> prépare ce texte, prêt à envoyer. Ce bouton devient <span style="color:#1d4ec9;font-weight:700;">bleu</span> pour un message codé et <span style="color:#1f7a37;font-weight:700;">vert</span> pour un message décodé, selon ce qui se trouve dans l'onglet Résultat.</li>
         <li>Boutons de partage rapide : <strong>WhatsApp</strong>, <strong>Telegram</strong>, <strong>Message</strong> (SMS), <strong>E-mail</strong>, et <strong>Partager</strong> pour ouvrir le menu de partage natif de votre appareil (Messenger, Signal, Instagram, etc.).</li>
         <li><strong>Copier</strong> reste la solution la plus fiable pour les applications qui bloquent le texte pré-rempli (comme Facebook).</li>
       </ul>
@@ -642,27 +692,53 @@
     return bytes;
   }
 
+  // Signature de contrôle insérée AVANT le texte (donc chiffrée avec lui) pour
+  // pouvoir détecter une clé incorrecte au décodage : sans cette vérification,
+  // un XOR avec une mauvaise clé produit silencieusement un texte "décodé"
+  // qui n'est que du charabia, sans jamais lever d'erreur.
+  const SIGNATURE = "TC1:";
+  const SIGNATURE_BYTES = strToBytes(SIGNATURE);
+
   function encodeText(text, key) {
     const textBytes = strToBytes(text);
     const keyBytes = strToBytes(key);
-    const out = new Uint8Array(textBytes.length + 1);
-    for (let i = 0; i < textBytes.length; i++) {
-      out[i] = textBytes[i] ^ keyBytes[i % keyBytes.length];
+    const payload = new Uint8Array(SIGNATURE_BYTES.length + textBytes.length);
+    payload.set(SIGNATURE_BYTES, 0);
+    payload.set(textBytes, SIGNATURE_BYTES.length);
+    const out = new Uint8Array(payload.length + 1);
+    for (let i = 0; i < payload.length; i++) {
+      out[i] = payload[i] ^ keyBytes[i % keyBytes.length];
     }
-    out[textBytes.length] = 0x3B; // ';' terminateur
+    out[payload.length] = 0x3B; // ';' terminateur
     return bytesToBase64(out);
   }
 
   function decodeText(cipherB64, key) {
     const allBytes = base64ToBytes(cipherB64);
+    if (allBytes.length < SIGNATURE_BYTES.length + 1) {
+      throw new Error("WRONG_KEY");
+    }
     const cipherBytes = allBytes.slice(0, allBytes.length - 1); // retire le ';'
     const keyBytes = strToBytes(key);
-    let result = "";
+    const decodedBytes = new Uint8Array(cipherBytes.length);
     for (let i = 0; i < cipherBytes.length; i++) {
-      result += String.fromCharCode(cipherBytes[i] ^ keyBytes[i % keyBytes.length]);
+      decodedBytes[i] = cipherBytes[i] ^ keyBytes[i % keyBytes.length];
+    }
+    // Vérifie la signature : si elle ne correspond pas, la clé est incorrecte
+    // (ou le texte codé est invalide/corrompu). On refuse alors de renvoyer
+    // un texte "décodé" qui ne serait que du charabia.
+    for (let i = 0; i < SIGNATURE_BYTES.length; i++) {
+      if (decodedBytes[i] !== SIGNATURE_BYTES[i]) {
+        throw new Error("WRONG_KEY");
+      }
+    }
+    let result = "";
+    for (let i = SIGNATURE_BYTES.length; i < decodedBytes.length; i++) {
+      result += String.fromCharCode(decodedBytes[i]);
     }
     return result;
   }
+
 
   // Permet de coller le message partagé en entier (avec indice/clé) :
   // on extrait automatiquement la ligne de texte codé.
@@ -697,6 +773,8 @@
 
   // Décode un texte codé (simple ou double, détecté automatiquement via DOUBLE_MARKER).
   // Réutilisée par le bouton Décoder (onglet Texte) et Décoder ce résultat (onglet Résultat).
+  // legacy=true : utilise l'ancien décodage (sans vérification de clé), pour
+  // 
   function decodeCipherText(rawText, key) {
     const cipher = extractCipherFromInput(rawText);
     const decoded = decodeText(cipher, key);
@@ -857,6 +935,7 @@
     btnDecodeResult.style.display = show ? 'inline-flex' : 'none';
   }
 
+
   // --- Verrouillage de la zone Résultat ---
   // Tant que le résultat est un texte codé (qu'il vienne de Coder OU de
   // Cadenas / double codage — les deux passent par lastResultType === 'coded'),
@@ -921,8 +1000,16 @@
       updateResultLockState();
       switchTab('result');
     } catch (e) {
-      setStatus(statusMsg, "❌ Erreur : clé ou texte invalide.", false);
+      if (mode === 'decode' && e && e.message === 'WRONG_KEY') {
+        setStatus(statusMsg, "❌ Clé incorrecte : impossible de décoder ce texte avec cette clé. Vérifiez la clé et réessayez.", false);
+      } else {
+        setStatus(statusMsg, "❌ Erreur : clé ou texte invalide.", false);
+      }
       resultText.value = "";
+      lastResultType = null;
+      updateGenerateShareButtonColor();
+      updateDecodeResultButtonVisibility();
+      updateResultLockState();
     }
   }
 
@@ -1018,9 +1105,14 @@
       updateResultLockState();
       setStatus(saveStatus, wasDouble ? "✅ Résultat décodé (double codage détecté et déchiffré automatiquement)." : "✅ Résultat décodé.", true);
     } catch (e) {
-      setStatus(saveStatus, "❌ Erreur : impossible de décoder (vérifiez la clé).", false);
+      if (e && e.message === 'WRONG_KEY') {
+        setStatus(saveStatus, "❌ Clé incorrecte : impossible de décoder ce texte avec cette clé. Vérifiez la clé et réessayez.", false);
+      } else {
+        setStatus(saveStatus, "❌ Erreur : impossible de décoder (vérifiez la clé).", false);
+      }
     }
   });
+
 
   // --- Événement pour effacer le texte d'exemple ---
   document.getElementById('clearInputText').addEventListener('click', () => {
@@ -1030,10 +1122,31 @@
     inputText.focus();
   });
 
-  // Détecte aussi une saisie/collage manuel (Ctrl+V) directement dans le champ.
-  inputText.addEventListener('input', updateInputLockState);
+  // Détecte un collage (Ctrl+V) ou un dépôt de texte directement dans le
+  // champ, pour verrouiller la zone si c'est du texte codé. On ne fait
+  // volontairement PAS cette vérification pendant une frappe caractère par
+  // caractère : un mot tapé à la main (sans espace pour l'instant) peut par
+  // hasard avoir la forme du Base64 (lettres/chiffres, longueur multiple de
+  // 4) avant même que la phrase soit terminée, ce qui verrouillait le champ
+  // en plein milieu de la frappe et bloquait le curseur. Le verrouillage
+  // s'applique donc seulement au collage/dépôt, et est revérifié quand on
+  // quitte le champ (blur), au cas où un texte codé aurait été tapé à la main.
+  inputText.addEventListener('input', (e) => {
+    const type = e.inputType || '';
+    const isPasteOrDrop = type.indexOf('insertFromPaste') === 0
+      || type === 'insertFromDrop'
+      || type === 'insertReplacementText'
+      || !type; // certains navigateurs ne renseignent pas inputType (ex. IME) : par prudence on vérifie quand même.
+    if (isPasteOrDrop) {
+      updateInputLockState();
+    } else if (inputText.readOnly) {
+      // Un champ déjà verrouillé qui reçoit quand même une frappe (cas rare)
+      // reste protégé : on ne le déverrouille pas silencieusement ici.
+    }
+  });
+  inputText.addEventListener('blur', updateInputLockState);
 
-  // État initial (utile ici car un texte codé est déjà pré-rempli au chargement).
+  // État initial (utile si un texte codé est déjà pré-rempli au chargement).
   updateInputLockState();
 
   // --- Afficher / masquer la clé (visible par défaut) ---
@@ -1321,7 +1434,213 @@
       // Annulé ou non supporté, on ignore
     }
   });
+
+  // --- QR code : renvoie vers ce site avec le texte codé déjà rempli ---
+  // Seul le texte codé (Base64) est inclus dans le lien — jamais la clé —
+  // pour que la personne qui scanne doive obligatoirement la saisir elle-même.
+  const btnGenerateQr = document.getElementById('btnGenerateQr');
+  const qrWrap = document.getElementById('qrWrap');
+  const qrContainer = document.getElementById('qrContainer');
+  const qrStatus = document.getElementById('qrStatus');
+  const btnCopyQrImage = document.getElementById('btnCopyQrImage');
+  const btnSaveQrImage = document.getElementById('btnSaveQrImage');
+  const btnCopyQrLink = document.getElementById('btnCopyQrLink');
+  let currentQrLink = null; // gardé en mémoire pour le bouton Copier, jamais affiché à l'écran
+
+  // Convertit le Base64 standard (qui contient + / =) en Base64 "URL-safe"
+  // (- _ , sans le padding =) : le lien obtenu est plus court, plus propre à
+  // l'oeil, et n'a pas besoin d'être pourcent-encodé (%2B, %2F, %3D...) dans
+  // l'URL, contrairement au Base64 standard.
+  function toUrlSafeBase64(b64) {
+    return b64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+  }
+  function fromUrlSafeBase64(safe) {
+    let b64 = safe.replace(/-/g, '+').replace(/_/g, '/');
+    while (b64.length % 4 !== 0) b64 += '=';
+    return b64;
+  }
+
+  // Construit un lien "nettoyé" : uniquement l'origine + le chemin de la page,
+  // suivis du texte codé (en Base64 URL-safe) placé dans le FRAGMENT (#c=...)
+  // plutôt que dans un paramètre de requête (?c=...). Un fragment n'est jamais
+  // envoyé au serveur qui héberge la page : tout reste strictement entre le
+  // navigateur qui génère le lien et celui qui l'ouvre — aucun service tiers,
+  // aucune requête réseau, aucun log serveur.
+  function buildShareLink(codedText) {
+    const base = window.location.origin + window.location.pathname;
+    return base + "#c=" + toUrlSafeBase64(codedText);
+  }
+
+  btnGenerateQr.addEventListener('click', () => {
+    setStatus(qrStatus, "", false);
+    const codedText = resultText.value;
+
+    if (!codedText || lastResultType !== 'coded') {
+      setStatus(qrStatus, "⚠️ Code d'abord un texte (bouton Coder ou Cadenas) : le QR code doit pointer vers un texte codé, jamais vers un texte en clair.", false);
+      qrWrap.style.display = 'none';
+      return;
+    }
+
+    if (typeof QRCode === 'undefined') {
+      setStatus(qrStatus, "❌ Impossible de générer le QR code (bibliothèque non chargée — vérifiez la connexion internet).", false);
+      return;
+    }
+
+    const isLocalFile = window.location.protocol === 'file:';
+    const link = buildShareLink(codedText);
+
+    // Plus le texte codé est long, plus le QR code contient de petits carrés
+    // ("modules") : à taille d'image fixe, ils deviennent minuscules et le
+    // code devient illisible au moindre flou de caméra. On agrandit donc
+    // l'image en fonction de la longueur du lien, et on utilise un niveau de
+    // correction d'erreur plus léger (L) qui réduit la densité pour une même
+    // quantité de données.
+    const qrSize = Math.max(220, Math.min(560, 200 + Math.round(link.length * 1.3)));
+
+    qrContainer.innerHTML = "";
+    try {
+      new QRCode(qrContainer, {
+        text: link,
+        width: qrSize,
+        height: qrSize,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+        correctLevel: QRCode.CorrectLevel.L
+      });
+    } catch (e) {
+      setStatus(qrStatus, "❌ Impossible de générer le QR code.", false);
+      return;
+    }
+
+    currentQrLink = link;
+    qrWrap.style.display = 'block';
+
+    let msg = "✅ QR code prêt. En le scannant, on arrive directement sur le site avec le texte codé déjà rempli — il suffit d'entrer la clé.";
+    if (link.length > 300) {
+      msg += " ⚠️ Le texte est assez long, donc le QR code est dense et peut être difficile à scanner selon l'appareil et la distance. Si le scan échoue, rapprochez/éloignez la caméra, affichez le QR en plus grand, ou préférez « Copier le lien »/le partage par message pour les textes longs.";
+    }
+    if (isLocalFile) {
+      msg += " ⚠️ Cette page est ouverte en local (adresse file://) : ce lien ne fonctionnera que sur cet appareil. Mettez cette page en ligne (hébergement web) pour que le partage fonctionne ailleurs.";
+    }
+    setStatus(qrStatus, msg, !isLocalFile);
+  });
+
+  btnCopyQrLink.addEventListener('click', async () => {
+    if (!currentQrLink) return;
+    try {
+      await navigator.clipboard.writeText(currentQrLink);
+      setStatus(qrStatus, "✅ Lien copié dans le presse-papiers !", true);
+    } catch (e) {
+      const tempArea = document.createElement('textarea');
+      tempArea.value = currentQrLink;
+      tempArea.style.position = 'fixed';
+      tempArea.style.opacity = '0';
+      document.body.appendChild(tempArea);
+      tempArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(tempArea);
+      setStatus(qrStatus, "✅ Lien copié dans le presse-papiers !", true);
+    }
+  });
+
+  // --- Copier / enregistrer l'image du QR code seul (sans le reste de la page) ---
+  // QRCode.js dessine le code dans un <canvas> (avec un <img> de secours pour
+  // les très vieux navigateurs) : on récupère ce canvas pour en extraire une
+  // image PNG propre, cadrée uniquement sur le QR code.
+  function getQrCanvas() {
+    return qrContainer.querySelector('canvas');
+  }
+
+  function getQrPngBlob(callback) {
+    const canvas = getQrCanvas();
+    if (canvas && canvas.toBlob) {
+      canvas.toBlob(callback, 'image/png');
+      return;
+    }
+    // Repli si aucun canvas n'est disponible (vieux navigateur) : on part de
+    // l'image <img> générée par QRCode.js.
+    const img = qrContainer.querySelector('img');
+    if (!img || !img.src) { callback(null); return; }
+    fetch(img.src).then(r => r.blob()).then(callback).catch(() => callback(null));
+  }
+
+  btnCopyQrImage.addEventListener('click', () => {
+    if (!currentQrLink) return;
+    if (!navigator.clipboard || !window.ClipboardItem) {
+      setStatus(qrStatus, "❌ Votre navigateur ne permet pas de copier une image dans le presse-papiers. Utilisez « Enregistrer le QR code » à la place.", false);
+      return;
+    }
+    getQrPngBlob(async (blob) => {
+      if (!blob) {
+        setStatus(qrStatus, "❌ Impossible de récupérer l'image du QR code.", false);
+        return;
+      }
+      try {
+        await navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]);
+        setStatus(qrStatus, "✅ QR code copié dans le presse-papiers (image seule).", true);
+      } catch (e) {
+        setStatus(qrStatus, "❌ Impossible de copier l'image (autorisez l'accès au presse-papiers dans votre navigateur).", false);
+      }
+    });
+  });
+
+  btnSaveQrImage.addEventListener('click', () => {
+    if (!currentQrLink) return;
+    getQrPngBlob((blob) => {
+      if (!blob) {
+        setStatus(qrStatus, "❌ Impossible de récupérer l'image du QR code.", false);
+        return;
+      }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'qrcode_titicrypt.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 2000);
+      setStatus(qrStatus, "✅ QR code enregistré (image seule).", true);
+    });
+  });
+
+  // --- Réception d'un lien/QR code contenant un texte codé ---
+  // Pré-remplit automatiquement la zone Texte avec le texte codé reçu, pour que
+  // la personne qui scanne n'ait plus qu'à entrer la clé puis cliquer sur Décoder.
+  // Nouveau format (nettoyé) : #c=xxxx (fragment, Base64 URL-safe).
+  (function loadCodedTextFromLink() {
+    let coded = null;
+
+    const hash = window.location.hash || "";
+    const hashMatch = hash.match(/^#c=(.+)$/);
+    if (hashMatch) {
+      try {
+        coded = fromUrlSafeBase64(decodeURIComponent(hashMatch[1]));
+      } catch (e) {
+        coded = null;
+      }
+    }
+
+    if (!coded) {
+      const params = new URLSearchParams(window.location.search);
+      coded = params.get('c');
+    }
+
+    if (!coded) return;
+
+    inputText.value = coded;
+    updateInputLockState();
+    switchTab('text');
+    setStatus(statusMsg, "🔐 Texte codé reçu — entrez la clé puis cliquez sur Décoder.", true);
+
+    // Nettoie l'adresse pour ne pas garder le texte codé visible dans la barre
+    // d'adresse ni dans l'historique du navigateur.
+    const cleanUrl = window.location.origin + window.location.pathname;
+    window.history.replaceState({}, document.title, cleanUrl);
+
+    keyField.focus();
+  })();
 </script>
+
 
 </body>
 </html>
